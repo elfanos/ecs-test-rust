@@ -7,7 +7,7 @@ use crate::ecs::ecs::{
     component::IComponent,
     component_manager::ComponentManager,
     config::{EntityType, Signature},
-    entity_manager::{EntityManager, EntityManagerResponse},
+    entity_manager::EntityManager,
     system::System,
     system_manager::SystemManager,
 };
@@ -53,8 +53,7 @@ impl EcsSingleton {
     }
 
     pub fn get_component_type<T: Any>(&mut self) -> u32 {
-        let val = self.component_manager.get_component_type::<T>();
-        *val
+        *self.component_manager.get_component_type::<T>()
     }
 
     pub fn register_system<T: Any>(&mut self) -> TypeId {

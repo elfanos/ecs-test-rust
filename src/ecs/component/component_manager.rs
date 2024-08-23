@@ -81,8 +81,6 @@ impl ComponentManager {
         let mut guard = self.get_component_array::<T>().lock().unwrap();
         let data = guard.get_data::<T>(entity);
 
-        // Use a reference obtained from the locked data
-
         unsafe { &*(data as *const _) }
     }
 
@@ -112,9 +110,7 @@ mod component_manager {
     }
 
     impl IComponent for TestComponent {
-        fn entity_destroyed(&mut self, _entity: EntityType) {
-            // You can add specific logic for what should happen when an entity is destroyed.
-        }
+        fn entity_destroyed(&mut self, _entity: EntityType) {}
     }
 
     #[test]
@@ -154,51 +150,3 @@ mod component_manager {
         assert_eq!(numbers_of_entries, 1);
     }
 }
-
-// #[test]
-// pub fn test_register_entity_to_singleton_with_components() {
-//     // register components
-//     let mut singleton = EcsSingleton::new();
-//     singleton.register_component::<Transform>();
-//     singleton.register_component::<RigidBody>();
-//
-//     // create a entity with components
-//     let entity = singleton.create_entity();
-//     let force = Vec3::new(1.0, 1.0, 1.0);
-//     singleton.add_component(entity, RigidBody { force });
-//     let position = Vec3::new(1.0, 0.0, 1.0);
-//     singleton.add_component(entity, Transform { position });
-//
-//     // get components by using an entity
-//     let rigid_body = singleton.get_component::<RigidBody>(entity);
-//     let transform_component = singleton.get_component::<Transform>(entity);
-//
-//     assert_eq!(transform_component.position, position);
-//     assert_eq!(rigid_body.force, force);
-// }
-//
-// #[test]
-// pub fn test_register_system_and_match_a_entity() {
-//     let mut singleton = EcsSingleton::new();
-//     singleton.register_component::<Transform>();
-//     singleton.register_component::<RigidBody>();
-//
-//     singleton.register_system::<Physics>();
-//
-//     let mut signature: Signature = Default::default();
-//     signature.insert(singleton.get_component_type::<Transform>() as usize);
-//     signature.insert(singleton.get_component_type::<RigidBody>() as usize);
-//     singleton.set_system_signature::<Physics>(signature);
-//
-//     let entity = singleton.create_entity();
-//     let force = Vec3::new(1.0, 1.0, 1.0);
-//     singleton.add_component(entity, RigidBody { force });
-//     let position = Vec3::new(1.0, 0.0, 1.0);
-//     singleton.add_component(entity, Transform { position });
-//
-//     if let Ok(sys) = singleton.get_system::<Physics>().clone().lock() {
-//         sys.run_system(|sys| {
-//             assert_eq!(sys.entities.len(), 1);
-//         })
-//     }
-// }

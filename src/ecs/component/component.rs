@@ -5,7 +5,6 @@ use crate::ecs::ecs::config::{EntityType, MAX_ENTITIES};
 
 pub trait IComponent: Any {
     fn entity_destroyed(&mut self, entity: EntityType);
-    // fn get_component<T>(&mut self) -> Self;
 }
 
 #[derive(Debug)]
@@ -24,7 +23,6 @@ impl ComponentArray {
             size: 0,
         }
     }
-    // pub fn get_component_array()->
 
     pub fn insert_data<T: IComponent + 'static>(&mut self, entity: EntityType, component: T) {
         let new_index = self.size;
@@ -72,7 +70,7 @@ impl ComponentArray {
         {
             return v;
         } else {
-            panic!("wawd");
+            panic!("Cant get data from entity");
         }
     }
     pub fn get_components(&mut self) -> &[Option<Box<dyn Any>>] {
@@ -102,7 +100,6 @@ impl ComponentArray {
 
         self.size -= 1;
     }
-    //
 }
 impl IComponent for ComponentArray {
     fn entity_destroyed(&mut self, entity: EntityType) {
@@ -112,22 +109,8 @@ impl IComponent for ComponentArray {
     }
 }
 
-// Implement Debug for dyn IComponents (this is optional if you have a concrete implementation)
 impl std::fmt::Debug for dyn IComponent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("IComponents").finish()
-    }
-}
-
-#[cfg(test)]
-mod components {
-    use super::*;
-
-    type EntityType = u32;
-    const MAX_ENTITIES: usize = 1000;
-
-    #[derive(Debug, PartialEq, Eq)]
-    struct TestComponent {
-        value: i32,
     }
 }

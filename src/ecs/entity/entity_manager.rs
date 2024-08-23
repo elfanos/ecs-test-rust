@@ -1,12 +1,5 @@
 use core::panic;
-use std::{
-    collections::VecDeque,
-    ops::{Index, IndexMut},
-    usize,
-};
-
-use array_init::array_init;
-use bit_set::BitSet;
+use std::{collections::VecDeque, ops::IndexMut, usize};
 
 use crate::ecs::ecs::config::{EntityType, Signature, MAX_ENTITIES};
 
@@ -60,7 +53,6 @@ impl EntityManager {
     }
 
     pub fn get_signature(&mut self, entity: EntityType) -> &mut Signature {
-        println!("enitity {:?}", entity);
         if let Some(signature) = self.signatures.index_mut(entity as usize) {
             return signature;
         }

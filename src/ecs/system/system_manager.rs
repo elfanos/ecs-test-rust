@@ -33,11 +33,10 @@ impl SystemManager {
     pub fn register_system<T: Any>(&mut self) -> TypeId {
         let system_shared_value = Mutex::new(System::new());
         let arc_system = Arc::new(system_shared_value);
-        let wata = TypeId::of::<T>();
+        let type_id = TypeId::of::<T>();
 
-        // shared ptr for in threads, arc for thread safe
-        if let None = self.systems.insert(wata, arc_system) {
-            return wata;
+        if let None = self.systems.insert(type_id, arc_system) {
+            return type_id;
         }
         panic!("Trying to add a duplicate system")
     }
@@ -45,11 +44,10 @@ impl SystemManager {
     pub fn register_system_func<T: Any>(&mut self) -> TypeId {
         let system_shared_value = Mutex::new(System::new());
         let arc_system = Arc::new(system_shared_value);
-        let wata = TypeId::of::<T>();
+        let type_id = TypeId::of::<T>();
 
-        // shared ptr for in threads, arc for thread safe
-        if let None = self.systems.insert(wata, arc_system) {
-            return wata;
+        if let None = self.systems.insert(type_id, arc_system) {
+            return type_id;
         }
         panic!("Trying to add a duplicate system")
     }
@@ -60,30 +58,22 @@ impl SystemManager {
 
     pub fn entity_destroyed(&mut self, entity: EntityType) {
         for system in self.systems.iter_mut() {
-            let (_, s_p) = system;
-            let locker = s_p.clone();
-            if let Ok(mut s) = locker.lock() {
-                s.entities.remove(&entity);
+            let (_, system_shared_ptr) = system;
+            let system_shared = system_shared_ptr.clone();
+            if let Ok(mut system_mutext) = system_shared.lock() {
+                system_mutext.entities.remove(&entity);
             };
         }
     }
     pub fn entity_signature_changed(&mut self, entity: EntityType, signature: &Signature) {
         for system in self.systems.iter_mut() {
-            let (v, s_p) = system;
-            println!("system typeid {:?} system: {:?}", v, s_p);
-            if let Ok(mut s) = s_p.clone().lock() {
-                if let Some(ss) = self.signatures.get(&v) {
-                    // signature {1} selected signature {0, 1}
-                    println!(
-                        "signature {:?} selected signature {:?} is a subset ? {:?}",
-                        signature,
-                        ss,
-                        signature.is_subset(ss)
-                    );
-                    if signature.is_subset(ss) {
-                        s.entities.insert(entity);
+            let (type_id, system_shared_ptr) = system;
+            if let Ok(mut system_mutext) = system_shared_ptr.clone().lock() {
+                if let Some(self_signature) = self.signatures.get(&type_id) {
+                    if self_signature.is_subset(signature) {
+                        system_mutext.entities.insert(entity);
                     } else {
-                        s.entities.remove(&entity);
+                        system_mutext.entities.remove(&entity);
                     }
                 }
             }
